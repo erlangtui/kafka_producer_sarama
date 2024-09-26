@@ -49,6 +49,7 @@ func NewProducer(c *Config) (Producer, error) {
 	}
 	mPer.ctx, mPer.cancel = context.WithCancel(context.Background())
 	mPer.start()
+
 	mylog.Println("topic", c.Topic, "producer started")
 
 	return mPer, nil
@@ -84,16 +85,9 @@ func (p *myProducer) start() {
 						return
 					}
 					if msg != nil && msg.Msg != nil || msg.Msg.Value != nil {
-						k, _ := msg.Msg.Key.Encode()
 						v, _ := msg.Msg.Value.Encode()
-						lj := map[string]interface{}{
-							"topic": ip.cfg.Topic,
-							"key":   string(k),
-							"value": string(v),
-							"error": msg.Err.Error(),
-						}
-						ip.fileWriter.Info(lj)
-						mylog.Println(lj)
+						ip.fileWriter.Info(string(v))
+						mylog.Printf("msg: %s, err: %s\n", string(v), msg.Error())
 					}
 				}
 			}

@@ -16,11 +16,14 @@ import (
 
 func main() {
 	c := &kafka_producer_sarama.Config{
-		Brokers:   []string{"10.182.29.28:19092", "10.182.29.28:29092", "10.182.29.28:39092"},
-		Topic:     "my_producer_topic",
-		LogOut:    os.Stdout,
-		SaramaCfg: sarama.NewConfig(),
+		Brokers:        []string{"10.182.29.28:19092", "10.182.29.28:29092", "10.182.29.28:39092"},
+		Topic:          "my_producer_topic",
+		FailedMsgSaved: true,
+		LogOut:         os.Stdout,
+		MsgChanCap:     10,
+		SaramaCfg:      sarama.NewConfig(),
 	}
+	c.SaramaCfg.Metadata.RefreshFrequency = time.Second * 10
 	p, err := kafka_producer_sarama.NewProducer(c)
 	if err != nil {
 		log.Printf("Start error, err: %s\n", err.Error())
@@ -51,7 +54,7 @@ func main() {
 			p.Write(string(msgJson))
 			log.Println(string(msgJson))
 			i++
-			time.Sleep(time.Millisecond * 100)
+			time.Sleep(time.Millisecond * 500)
 		}
 	}()
 
